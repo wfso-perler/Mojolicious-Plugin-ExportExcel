@@ -121,8 +121,11 @@ sub export_excel_renderer{
       }
       
       if($o->{map}){
-        $d = $o->{map}->{$d};
+        $d = $o->{map}->{$d} || $o->{map}->{default};
+      }elsif($o->{action}){
+        $d = $o->{action}->($d, $srd);
       }
+      
       my $df;
       my $cf_json = to_json($cf);
       if($df_cache->{$cf_json}){
@@ -137,7 +140,7 @@ sub export_excel_renderer{
       }elsif($o->{type} eq "url"){
         $ss->write_url($row, $col, $d, $df);
       }else{
-        $ss->write_string($row, $col, $d, $df);
+        $ss->write($row, $col, $d, $df);
       }
       $col++;
     }
@@ -174,7 +177,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '1.0.1';
+our $VERSION = '1.1.1';
 
 
 =head1 SYNOPSIS
@@ -224,8 +227,15 @@ Mojolicious::Plugin::ExportExcel 覆盖了Mojolicious::Plugin中的register方�
           3 => "完成",
           4 => "取消"
         },
+        action=>sub{                   ## action 与 map 只有一个工作，且map优先级高
+          ## 接收两个参数，
+          ## 第一个为 当前单元格的值
+          ## 第二个为 当前行的hash对象
+          ## 返回的值会被作为当前单元格的最值写入excel表中
+          ## 其实功能与 map 类似
+        }
         type=>"string",             ## 数据类型，string,number,url
-        format=>{}                  ## 对应列的样式
+        format=>{},                  ## 对应列的样式
       },
       ……
     ];
