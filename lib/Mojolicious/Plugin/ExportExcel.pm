@@ -26,7 +26,7 @@ sub export_excel_renderer{
   }
   
   ## $settings 是 excel 表的配置信息
-  my $settings = $excel->{settings};
+  my $settings = $excel->{settings} || {};
   
   ## $settings 是 excel 表的数据信息
   my $data = $excel->{data};
@@ -76,33 +76,24 @@ sub export_excel_renderer{
   my $heading = [];
   
   ## 计算表头
+  my $col = 0;
   foreach my $o(@{$option}){
     if($o->{header}){
       push(@{$heading}, $o->{header});
     }else{
       push(@{$heading}, $o->{key});
     }
+    $ss->set_column($col, $col, $o->{width}) if($o->{width});
+    $col++;
   }
   my $row = 0;
   $ss->set_row($row, $header_height);
   $ss->write_row($row, 0, $heading, $excel_obj->add_format(%{$header_format}));
   $row++;
   
-  ## 写入配置信息
-  if(ref $settings){
-    for my $col (keys %{$settings}){
-      next if($col eq "header_format"
-        || $col eq "data_format"
-        || $col eq "sheet_name"
-        || $col eq "condition_format"
-      );
-      $ss->set_column($col, $settings->{$col});
-    }
-  }
-  
   ## 对数据依照渲染规则进行渲染
   foreach my $srd (@{$data}){
-    my $col = 0;
+    $col = 0;
     
     ## 计算得到当前行的格式
     my $rf = clone($data_format);
@@ -183,7 +174,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.1.1';
+our $VERSION = '1.0.1';
 
 
 =head1 SYNOPSIS
