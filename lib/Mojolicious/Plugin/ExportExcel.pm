@@ -51,22 +51,22 @@ sub export_excel_renderer{
   
   ##----------------------共用的格式写在下面--------------------------
   ## 表头的样式
-  my $header_format = delete $settings->{header_format} || {bold => 1};
+  my $header_format = $settings->{header_format} || {bold => 1};
   
   ## 表头高度
-  my $header_height = delete $settings->{header_height} || 20;
+  my $header_height = $settings->{header_height} || 20;
   
   ## 数据行的样式
-  my $data_format = delete $settings->{data_format} || {};
+  my $data_format = $settings->{data_format} || {};
   
   ## 样式缓存，一个表中能添加的样式是有限的，多了后面的就不起效果了
   my $df_cache = {};
   
   ## 数据行高度
-  my $data_height = delete $settings->{data_height} || 20;
+  my $data_height = $settings->{data_height} || 20;
   
   ## 条件样式
-  my $condition_format = delete $settings->{condition_format} || {};
+  my $condition_format = $settings->{condition_format} || {};
   
   ##----------------------共用的格式写在上面--------------------------
   
@@ -167,6 +167,9 @@ sub register{
   );
 }
 
+
+=encoding utf8
+
 =head1 NAME
 
 Mojolicious::Plugin::ExportExcel - The great new Mojolicious::Plugin::ExportExcel!
@@ -177,7 +180,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '1.1.1';
+our $VERSION = '1.1.2';
 
 
 =head1 SYNOPSIS
@@ -268,7 +271,7 @@ Mojolicious::Plugin::ExportExcel 覆盖了Mojolicious::Plugin中的register方�
                 ……
             }
         },
-        ‘A:A'=>100            ## 对应列的宽度
+        'A:A'=>100            ## 对应列的宽度
             
     }
 
