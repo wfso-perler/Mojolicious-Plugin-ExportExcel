@@ -51,7 +51,7 @@ sub export_excel_renderer{
   
   ##----------------------共用的格式写在下面--------------------------
   ## 表头的样式
-  my $header_format = $settings->{header_format} || {bold => 1};
+  my $header_format = $settings->{header_format} || { bold => 1 };
   
   ## 表头高度
   my $header_height = $settings->{header_height} || 20;
@@ -71,16 +71,16 @@ sub export_excel_renderer{
   ##----------------------共用的格式写在上面--------------------------
   
   
-  
   ## 开始渲染
   my $heading = [];
   
   ## 计算表头
   my $col = 0;
-  foreach my $o(@{$option}){
+  foreach my $o (@{$option}){
     if($o->{header}){
       push(@{$heading}, $o->{header});
-    }else{
+    }
+    else{
       push(@{$heading}, $o->{key});
     }
     $ss->set_column($col, $col, $o->{width}) if($o->{width});
@@ -100,29 +100,30 @@ sub export_excel_renderer{
     if($condition_format->{row} && @{$condition_format->{row}}){
       foreach(@{$condition_format->{row}}){
         if($_->{condition}->($srd->{$_->{key}})){
-          $rf = {%{$rf}, $_->{format} ? %{$_->{format}} : ()};
+          $rf = { %{$rf}, $_->{format} ? %{$_->{format}} : () };
         }
       }
     }
     
     $ss->set_row($row, $data_height);
     
-    foreach my $o(@{$option}){
+    foreach my $o (@{$option}){
       my $d = $srd->{$o->{key}};
       
       ## 单元格样式
-      my $cf = {%{$rf}, $o->{format} ? %{$o->{format}} : ()};
+      my $cf = { %{$rf}, $o->{format} ? %{$o->{format}} : () };
       
       if($condition_format->{cell} && $condition_format->{cell}->{$o->{key}}){
         if($condition_format->{cell}->{$o->{key}}->{condition}->($d)){
           my $tf = $condition_format->{cell}->{$o->{key}}->{format};
-          $cf = {%{$cf}, $tf ? %{$tf} : ()};
+          $cf = { %{$cf}, $tf ? %{$tf} : () };
         }
       }
       
       if($o->{map}){
         $d = $o->{map}->{$d} || $o->{map}->{default};
-      }elsif($o->{action}){
+      }
+      elsif($o->{action}){
         $d = $o->{action}->($d, $srd);
       }
       
@@ -130,16 +131,25 @@ sub export_excel_renderer{
       my $cf_json = to_json($cf);
       if($df_cache->{$cf_json}){
         $df = $df_cache->{$cf_json};
-      }else{
+      }
+      else{
         $df_cache->{$cf_json} = $df = $excel_obj->add_format(%{$cf});
       }
-      if($o->{type} eq "number"){
-        $ss->write_number($row, $col, $d, $df);
-      }elsif($o->{type} eq "string"){
-        $ss->write_string($row, $col, $d, $df);
-      }elsif($o->{type} eq "url"){
-        $ss->write_url($row, $col, $d, $df);
-      }else{
+      if($o->{type}){
+        if($o->{type} eq "number"){
+          $ss->write_number($row, $col, $d, $df);
+        }
+        elsif($o->{type} eq "string"){
+          $ss->write_string($row, $col, $d, $df);
+        }
+        elsif($o->{type} eq "url"){
+          $ss->write_url($row, $col, $d, $df);
+        }
+        else{
+          $ss->write($row, $col, $d, $df);
+        }
+      }
+      else{
         $ss->write($row, $col, $d, $df);
       }
       $col++;
@@ -180,7 +190,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '1.1.2';
+our $VERSION = '1.1.3';
 
 
 =head1 SYNOPSIS
